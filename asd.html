@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#050506" />
+
+  <title>⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀angelgrind</title>
+
+  <link rel="preconnect" href="https://r2.fakecrime.bio" crossorigin />
+  <link rel="icon" href="https://r2.fakecrime.bio/favicons/1110beec-8d09-46ba-9a1b-ba2d6a38e15b.webp" />
+
+  <style>
+
+    :root{
+      --accent:#2e2e2e;
+      --bg:#050506;
+      --stroke:rgba(255,255,255,.08);
+      --stroke2:rgba(255,255,255,.12);
+      --text:rgba(240,240,240,.92);
+      --muted:rgba(205,205,210,.62);
+      --shadow:rgba(0,0,0,.68);
+      --r-xl:26px;
+      --r-lg:18px;
+      --maxw:980px;
+      --cursor:url("https://r2.fakecrime.bio/assets/cursors/mini.cur") 0 0, auto;
+    }
+
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Tahoma, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      cursor:var(--cursor);
+      overflow-x:hidden;
+    }
+    a, button, input[type="range"]{ cursor: var(--cursor); }
+
+    /* Background */
+    .bg{
+      position:fixed; inset:0; z-index:-3;
+      background:url("https://r2.fakecrime.bio/backgrounds/582645f5-b60d-480d-b5c3-82a43d441640.jpg") center/cover no-repeat fixed;
+      filter:blur(8px);
+      transform:scale(1.06);
+      opacity:.95;
+    }
+    .shade{
+      position:fixed; inset:0; z-index:-2; pointer-events:none;
+      background:
+        radial-gradient(900px 600px at 22% 8%, rgba(255,255,255,.06), transparent 60%),
+        radial-gradient(800px 500px at 80% 85%, rgba(255,255,255,.04), transparent 60%),
+        linear-gradient(to bottom, rgba(0,0,0,.62), rgba(0,0,0,.82));
+    }
+    .grain{
+      position:fixed; inset:0; z-index:-1; pointer-events:none;
+      opacity:.12;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0, rgba(255,255,255,.06) 1px, transparent 1px, transparent 3px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0, rgba(255,255,255,.045) 1px, transparent 1px, transparent 4px);
+      mix-blend-mode:overlay;
+    }
+
+    /* Reveal */
+    .reveal{
+      position:fixed; inset:0; z-index:99;
+      display:grid; place-items:center;
+      background:rgba(0,0,0,.80);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      user-select:none;
+    }
+    .reveal-inner{display:flex; flex-direction:column; align-items:center;}
+    .reveal-text{
+      font-size:12px;
+      letter-spacing:.6px;
+      color:rgba(240,240,240,.82);
+      text-transform:lowercase;
+      padding:10px 12px;
+    }
+    .reveal-hint{
+      margin-top:8px;
+      font-size:10px;
+      color:rgba(240,240,240,.35);
+    }
+
+    /* Main */
+    main{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:22px 14px 30px;
+    }
+    .shell{
+      width:min(var(--maxw), 100%);
+      opacity:0;
+      transform:translateY(16px) scale(.985);
+      pointer-events:none;
+      transition:opacity .55s ease, transform .55s cubic-bezier(.2,.8,.2,1);
+    }
+    body.is-ready .shell{
+      opacity:1;
+      transform:translateY(0) scale(1);
+      pointer-events:auto;
+    }
+
+    /* Card */
+    .card{
+      position:relative;
+      border:1px solid var(--stroke);
+      border-radius:var(--r-xl);
+      background:linear-gradient(180deg, rgba(0,0,0,.64), rgba(0,0,0,.36));
+      box-shadow:0 34px 90px var(--shadow);
+      overflow:hidden;
+
+      contain: paint;
+
+      backface-visibility:hidden;
+
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
+
+      clip-path: inset(0 round var(--r-xl));
+
+      transform-style:preserve-3d;
+      will-change:transform;
+      transform: translateZ(0) perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(var(--tz,0px));
+      transition:transform .75s cubic-bezier(.2,.8,.2,1),
+                 box-shadow .75s cubic-bezier(.2,.8,.2,1),
+                 border-color .75s cubic-bezier(.2,.8,.2,1);
+      isolation:isolate;
+    }
+    /* spotlight (behind content) */
+    .card::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      border-radius:inherit;
+      z-index:0;
+      background:radial-gradient(460px 320px at var(--mx, 50%) var(--my, 50%),
+        rgba(0,0,0,.62), transparent 62%);
+      opacity:0;
+      transition:opacity .18s ease;
+      mix-blend-mode:multiply;
+    }
+    .card:hover::before{opacity:.95;}
+    .card:hover{
+      border-color:rgba(255,255,255,.14);
+      box-shadow:0 40px 110px rgba(0,0,0,.72);
+      --tz:-10px;
+    }
+
+    .top, .content{ position:relative; z-index:1; }
+
+    .top{
+      padding:18px 18px 16px;
+      display:flex;
+      gap:14px;
+      align-items:center;
+      border-bottom:1px solid var(--stroke);
+      background:rgba(0,0,0,.25);
+    }
+    .avatar{
+      width:86px; height:86px;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid var(--stroke2);
+      background:rgba(255,255,255,.03);
+      box-shadow:0 18px 55px rgba(0,0,0,.7);
+      flex:0 0 auto;
+    }
+    .avatar img{width:100%; height:100%; object-fit:cover; display:block;}
+
+    .name{
+      margin:0;
+      font-size:22px;
+      font-weight:700;
+      letter-spacing:.4px;
+      text-transform:lowercase;
+      color:rgba(245,245,245,.92);
+    }
+    .sub{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap: 4px;
+    }
+    .gps{
+      width:12px; height:12px;
+      display:inline-block;
+      opacity:.9;
+      color:rgba(240,240,240,.45);
+      margin-right:-1px;
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));
+    }
+    .gps svg{width:12px;height:12px;display:block; fill:currentColor;}
+
+    .content{
+      padding:16px 18px 18px;
+      display:grid;
+      gap:14px;
+    }
+    .row2{display:grid; gap:14px;}
+    @media (min-width:920px){ .row2{grid-template-columns:1fr 1fr;} }
+
+    .panel{
+      position:relative;
+      border:1px solid var(--stroke);
+      border-radius:var(--r-lg);
+      background:rgba(0,0,0,.36);
+      padding:14px 14px 12px;
+      z-index:1;
+    }
+    .panel h2{
+      margin:0 0 10px;
+      font-size:11px;
+      letter-spacing:1.2px;
+      text-transform:uppercase;
+      color:rgba(240,240,240,.62);
+      font-weight:700;
+    }
+
+    .bio{font-size:13px; line-height:1.58; color:rgba(240,240,240,.88); word-break:break-word;}
+    .bio p{margin:10px 0;}
+    .quote{
+      margin:0 0 12px;
+      padding:10px 12px;
+      border-left:2px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.03);
+      border-radius:12px;
+      letter-spacing:.4px;
+    }
+    .center{text-align:center; color:rgba(240,240,240,.55); margin-top:12px;}
+
+    /* chat bubbles (iMessage-ish) */
+    .chat{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin:10px 0;
+    }
+    .bubble{
+      max-width:72%;
+      padding:7px 11px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(255, 255, 255, 0.021);
+      color:rgba(240, 240, 240, 0.541);
+      font-size:12px;
+      line-height:1.35;
+      position:relative;
+      filter:drop-shadow(0 10px 22px rgba(0,0,0,.55));
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+    .bubble.left{
+      align-self:flex-start;
+      border-top-left-radius:8px;
+    }
+    .bubble.right{
+      align-self:flex-end;
+      border-top-right-radius:8px;
+      background:rgba(255, 255, 255, 0.021);
+      border-color: rgba(255,255,255,.09);
+      color:rgba(240, 240, 240, 0.541);
+    }
+
+    /* tails */
+
+/* Icons */
+    .icons{display:flex; flex-wrap:wrap; gap:12px; align-items:center;}
+    .icon-link{
+      width:46px; height:46px;
+      border-radius:16px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.03);
+      display:grid; place-items:center;
+      text-decoration:none;
+      position:relative;
+      box-shadow:0 16px 55px rgba(0,0,0,.55);
+      transition:transform .16s ease, border-color .16s ease, filter .16s ease;
+      overflow:hidden;
+    }
+    .icon-link::after{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background:radial-gradient(140px 100px at 50% 50%, rgba(255,255,255,.06), transparent 65%);
+      opacity:0;
+      transition:opacity .18s ease;
+    }
+    .icon-link:hover{
+      transform:translateY(-1px);
+      border-color:rgba(255,255,255,.14);
+      filter:brightness(1.05);
+    }
+    .icon-link:hover::after{opacity:1;}
+
+    .icon-img{
+      width:28px; height:28px;
+      object-fit:contain;
+      display:block;
+      filter:none;
+      opacity:.95;
+      will-change:transform;
+      transform:translateX(0);
+    }
+    .icon-img.nofilter{filter:none; opacity:1;}
+    .icon-link.monolith .icon-img{filter:grayscale(1) brightness(.42) contrast(1.2);}
+    .icon-link.evolve .icon-img{width:34px; height:34px;}
+    @keyframes iconWave{
+      0%{transform:translateX(0) rotate(0deg);}
+      25%{transform:translateX(1.6px) rotate(.6deg);}
+      50%{transform:translateX(0) rotate(0deg);}
+      75%{transform:translateX(-1.6px) rotate(-.6deg);}
+      100%{transform:translateX(0) rotate(0deg);}
+    }
+    .icon-link:hover .icon-img{animation:iconWave 3.2s ease-in-out infinite;}
+
+    .tooltip{
+      position:absolute;
+      top:-40px; left:50%;
+      transform:translateX(-50%) translateY(6px);
+      opacity:0;
+      pointer-events:none;
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.75);
+      color:rgba(240,240,240,.9);
+      font-size:12px;
+      white-space:nowrap;
+      transition:opacity .16s ease, transform .16s ease;
+      box-shadow:0 22px 65px rgba(0,0,0,.6);
+    }
+    .icon-link:hover .tooltip{opacity:1; transform:translateX(-50%) translateY(0);}
+
+    /* TON */
+    .ton{
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      border-radius:var(--r-lg);
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.02);
+      text-decoration:none;
+      color:inherit;
+      transition:transform .16s ease, border-color .16s ease, filter .16s ease;
+    }
+    .ton:hover{transform:translateY(-1px); border-color:rgba(255,255,255,.14); filter:brightness(1.04);}
+    .ton img{
+      width:54px; height:54px;
+      border-radius:16px;
+      object-fit:cover;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      filter:grayscale(1) brightness(.30) contrast(1.3);
+    }
+    .ton .tmeta{min-width:0;}
+    .ton .tt{margin:0; font-size:13px; font-weight:700; letter-spacing:.3px;}
+    .ton .td{margin:4px 0 0; font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
+    /* Player */
+    .player{
+      border:1px solid var(--stroke);
+      border-radius:var(--r-lg);
+      background:rgba(0,0,0,.36);
+      overflow:hidden;
+    }
+    .player .phead{
+      padding:12px 12px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+    }
+    .trackmeta{min-width:0; flex:1;}
+    .trackmeta .label{
+      font-size:10px;
+      letter-spacing:1.2px;
+      text-transform:uppercase;
+      color:rgba(240,240,240,.52);
+      font-weight:700;
+    }
+    .trackmeta .tname{
+      position:relative;
+      margin-top:5px;
+      height:16px;
+      overflow:hidden;
+      color:rgba(240,240,240,.88);
+    
+      font-size:12px;
+    }
+    .tn{
+      position:absolute;
+      left:0; top:0;
+      width:100%;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    @keyframes inRight{from{transform:translateX(18px); opacity:0;} to{transform:translateX(0); opacity:1;}}
+    @keyframes outLeft{from{transform:translateX(0); opacity:1;} to{transform:translateX(-18px); opacity:0;}}
+    @keyframes inLeft{from{transform:translateX(-18px); opacity:0;} to{transform:translateX(0); opacity:1;}}
+    @keyframes outRight{from{transform:translateX(0); opacity:1;} to{transform:translateX(18px); opacity:0;}}
+    .in-right{animation:inRight .26s ease both;}
+    .out-left{animation:outLeft .26s ease both;}
+    .in-left{animation:inLeft .26s ease both;}
+    .out-right{animation:outRight .26s ease both;}
+
+    .btns{display:inline-flex; gap:8px; align-items:center;}
+    .btn{
+      width:36px; height:36px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.02);
+      display:grid; place-items:center;
+      transition:transform .14s ease, border-color .14s ease, filter .14s ease;
+    }
+    .btn:hover{transform:translateY(-1px); border-color:rgba(255,255,255,.15); filter:brightness(1.05);}
+    .btn svg{width:18px; height:18px; fill:var(--accent); filter:drop-shadow(0 10px 18px rgba(0,0,0,.85));}
+
+    .pbody{padding:12px; display:grid; gap:10px;}
+    .row{display:grid; grid-template-columns:52px 1fr 52px; gap:10px; align-items:center; color:var(--muted); font-size:11px;}
+    .row .right{text-align:right;}
+
+    /* range + local glow */
+    .range-wrap{
+      position:relative;
+      height:5px;
+      display:flex;
+      align-items:center;
+      --pos:50%;
+      --fill:0%;
+    }
+    .range-wrap::after{
+      content:"";
+      position:absolute;
+      inset:-6px -6px;
+      border-radius:999px;
+      pointer-events:none;
+      opacity:0;
+      transition:opacity .15s ease;
+      background:radial-gradient(120px 90px at var(--pos) 50%,
+        rgba(90,90,90,.20),
+        rgba(40,40,40,.10) 45%,
+        transparent 70%);
+    }
+    .range-wrap:hover::after{opacity:1;}
+
+    input[type="range"]{
+      -webkit-appearance:none;
+      appearance:none;
+      width:100%;
+      height:6px;
+      border-radius:999px;
+      background:
+        linear-gradient(to right,
+          rgba(46,46,46,.95) 0%,
+          rgba(46,46,46,.95) var(--fill),
+          rgba(255,255,255,.08) var(--fill),
+          rgba(255,255,255,.08) 100%);
+      outline:none;
+      transition:background .12s linear;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:14px; height:14px;
+      border-radius:999px;
+      background:rgba(240,240,240,.82);
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow:0 10px 25px rgba(0,0,0,.55);
+      transition:transform .16s ease, box-shadow .16s ease;
+    }
+    input[type="range"]:active::-webkit-slider-thumb{
+      transform:scale(1.12);
+      box-shadow:0 14px 35px rgba(0,0,0,.7);
+    }
+    input[type="range"]::-moz-range-thumb{
+      width:14px; height:14px;
+      border-radius:999px;
+      background:rgba(240,240,240,.82);
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow:0 10px 25px rgba(0,0,0,.55);
+      transition:transform .16s ease, box-shadow .16s ease;
+    }
+    input[type="range"]::-moz-range-track{
+      height:6px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+    }
+
+  
+    .bubble.left{ border-top-left-radius:20px; }
+    .bubble.right{ border-top-right-radius:20px; }
+
+    
+  </style>
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <div class="shade" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="reveal" id="reveal" aria-label="Reveal screen">
+    <div class="reveal-inner">
+      <div class="reveal-text">click if you want to embarrass yourself</div>
+      <div class="reveal-hint">(click anywhere)</div>
+    </div>
+  </div>
+
+  <main>
+    <div class="shell" id="shell">
+      <section class="card" id="card" aria-label="Bio card">
+        <div class="top">
+          <div class="avatar">
+            <img src="https://r2.fakecrime.bio/avatars/d30935e0-a9a5-433a-ba75-fb1eba3225aa.webp" alt="angelgrind avatar" loading="lazy" decoding="async" />
+          </div>
+          <div>
+            <h1 class="name">angelgrind</h1>
+            <div class="sub"> 
+              <span>what if it wasn't me??</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="content">
+          <section class="panel" aria-label="About">
+            <h2>About</h2>
+            <div class="bio">
+              <blockquote class="quote">why do you want to be famous?</blockquote>
+              <p>you'll never be like me.</p>
+
+              <div class="chat" aria-label="Chat lines">
+                <div class="bubble left">get outta here, noname</div>
+                <div class="bubble right">why no one knows you?</div>
+                <div class="bubble left">you'll never achieve my successes</div>
+              </div>
+
+              <p class="center">missed shot due to ?</p>
+            </div>
+          </section>
+
+          <div class="row2" aria-label="Links and player area">
+            <section class="panel" aria-label="Links">
+              <h2>Links</h2>
+
+              <div class="icons" aria-label="Icon links">
+                <a class="icon-link" href="https://perception.cx/members/herkowskyyy.887/" target="_blank" rel="noopener noreferrer" aria-label="Perception">
+                  <img class="icon-img" src="https://i.ibb.co/BS9DNJg/20260102-012834.png" alt="Perception logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Perception</span>
+                </a>
+
+                <a class="icon-link monolith" href="https://monolith.club/profile?user=Fomelgaut" target="_blank" rel="noopener noreferrer" aria-label="Monolith">
+                  <img class="icon-img" src="https://i.ibb.co/CKtWQt1S/20260102-012048.png" alt="Monolith logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Monolith</span>
+                </a>
+
+                <a class="icon-link" href="https://unmatched.gg/user/57" target="_blank" rel="noopener noreferrer" aria-label="Unmatched">
+                  <img class="icon-img" src="https://i.ibb.co/XZ0h8v6K/20260102-012310.png" alt="Unmatched logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Unmatched</span>
+                </a>
+
+                <a class="icon-link" href="https://umbra.top/forum/index.php?members/fomelgaut.374/" target="_blank" rel="noopener noreferrer" aria-label="Umbra">
+                  <img class="icon-img nofilter" src="https://i.ibb.co/xqps6LYT/download.webp" alt="Umbra logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Umbra</span>
+                </a>
+
+                <a class="icon-link" href="https://gamesense.pub/forums/profile.php?id=2195" target="_blank" rel="noopener noreferrer" aria-label="GameSense">
+                  <img class="icon-img nofilter" src="https://i.ibb.co/7xwf9QKt/gamesense.png" alt="GameSense logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">GameSense</span>
+                </a>
+
+                <a class="icon-link" href="https://melatonin.win/index.php?members/%E3%85%A4%E3%85%A4%E3%85%A4.1284/" target="_blank" rel="noopener noreferrer" aria-label="Melatonin">
+                  <img class="icon-img nofilter" src="https://i.ibb.co/998jnnQH/20260102-010635.png" alt="Melatonin logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Melatonin</span>
+                </a>
+
+                <a class="icon-link" href="https://midnight.im/members/95/" target="_blank" rel="noopener noreferrer" aria-label="Midnight">
+                  <img class="icon-img nofilter" src="https://i.ibb.co/yFqFx8K9/download.png" alt="Midnight logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Midnight</span>
+                </a>
+
+                <a class="icon-link" href="https://community.primordial.dev/members/developer.10400/" target="_blank" rel="noopener noreferrer" aria-label="Primordial">
+                  <img class="icon-img" src="https://i.ibb.co/s9GykFcV/20260102-012540.png" alt="Primordial logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Primordial</span>
+                </a>
+
+                <a class="icon-link" href="https://fatality.win/members/elfish.22002/" target="_blank" rel="noopener noreferrer" aria-label="Fatality">
+                  <img class="icon-img nofilter" src="https://i.ibb.co/d4cLkk6h/fatality.png" alt="Fatality logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Fatality</span>
+                </a>
+
+                <a class="icon-link" href="https://nixware.cc/members/88/" target="_blank" rel="noopener noreferrer" aria-label="Nixware">
+                  <img class="icon-img" src="https://i.ibb.co/LDRwK8xT/20260102-012215.png" alt="Nixware logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Nixware</span>
+                </a>
+
+                <a class="icon-link evolve" href="https://ev0lve.xyz/members/orion7531.69/" target="_blank" rel="noopener noreferrer" aria-label="Ev0lve">
+                  <img class="icon-img" src="https://i.ibb.co/CpWbBzFM/20260102-012643.png" alt="Ev0lve logo" loading="lazy" decoding="async" />
+                  <span class="tooltip" role="tooltip">Ev0lve</span>
+                </a>
+              </div>
+
+              <a class="ton" href="https://tonviewer.com/UQB_thiNsGo57HwOjgVukh-G_vj8edsIMhSBX2POSSnqVweQ" target="_blank" rel="noopener noreferrer" aria-label="TON link">
+                <img src="https://i.ibb.co/NgKpVrk7/20260102-013420.png" alt="TON icon" loading="lazy" decoding="async" />
+                <div class="tmeta">
+                  <p class="tt">TON</p>
+                  <p class="td">UQB_thiNsGo57HwOjgVukh-G_vj8edsIMhSBX2POSSnqVweQ</p>
+                </div>
+              </a>
+            </section>
+
+            <section class="player" aria-label="Audio player">
+              <div class="phead">
+                <div class="trackmeta">
+                  <div class="label">player</div>
+                  <div class="tname" id="trackName"></div>
+                </div>
+                <div class="btns">
+                  <button class="btn" type="button" id="prevBtn" aria-label="Previous track">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6v12H5V6zm12 .6a1.75 1.75 0 0 1-2.77 1.42L9.5 12l6.73 3.98A1.75 1.75 0 0 1 19 17.4z"/></svg>
+                  </button>
+                  <button class="btn" type="button" id="playBtn" aria-label="Play/pause">
+                    <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.4 9.4a3 3 0 0 1 0 5.2l-12.8 7A3 3 0 0 1 4 19V5a3 3 0 0 1 4.6-2.6z"/></svg>
+                  </button>
+                  <button class="btn" type="button" id="nextBtn" aria-label="Next track">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6v12h2V6zm-12 .6A1.75 1.75 0 0 0 7.77 8.02L14.5 12l-6.73 3.98A1.75 1.75 0 0 0 5 17.4z"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="pbody">
+                <div class="row">
+                  <span id="tCur">0:00</span>
+                  <div class="range-wrap" id="seekWrap">
+                    <input id="seek" type="range" min="0" max="1000" value="0" aria-label="Seek" />
+                  </div>
+                  <span class="right" id="tDur">0:00</span>
+                </div>
+
+                <div class="row">
+                    <span id="vPct">15%</span>
+                      <div class="range-wrap" id="volWrap">
+                        <input id="vol" type="range" min="0" max="1000" value="150" aria-label="Volume" />
+                      </div>
+                      <span class="right">100%</span>
+                    </div>
+
+
+                <audio id="audio" preload="none"></audio>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+
+
+
+    // title marquee
+    (function(){
+      const base = "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀angelgrind";
+      let t = base + "   ";
+      setInterval(() => {
+        t = t.slice(1) + t[0];
+        document.title = t;
+      }, 220);
+    })();
+
+    const reveal = document.getElementById("reveal");
+    const audio = document.getElementById("audio");
+
+        // Autoplay helper (reliable after user gesture)
+    let unmuteArmed = false;
+    function armUnmute(){
+      if (unmuteArmed) return;
+      unmuteArmed = true;
+      // as soon as playback actually starts, ensure we are unmuted
+      audio.addEventListener("playing", () => { try{ audio.muted = false; }catch(e){} }, { once:true });
+      // reset on stop
+      audio.addEventListener("ended", () => { unmuteArmed = false; }, { once:true });
+      audio.addEventListener("pause", () => { unmuteArmed = false; }, { once:true });
+    }
+
+    function forcePlay(){
+      armUnmute();
+
+      // 1) normal attempt
+      try{ audio.muted = false; }catch(e){}
+      const p1 = audio.play();
+      if (p1 && typeof p1.catch === "function"){
+        return p1.catch(() => {
+          // 2) fallback: start muted, then unmute right after start
+          try{ audio.muted = true; }catch(e){}
+          const p2 = audio.play();
+          if (p2 && typeof p2.then === "function"){
+            return p2.then(() => {
+              setTimeout(() => { try{ audio.muted = false; }catch(e){} }, 80);
+            }).catch(() => { try{ audio.muted = false; }catch(e){} });
+          }
+        });
+      }
+    }
+
+    const TRACKS = [
+      { name: "[tewiq] nacarapal", src: "https://r2.fakecrime.bio/tracks/audios/311bd206-bd84-4dd8-86af-f6afa0b1f282.mp3" },
+      { name: "[ivycraft] beethoven went crazy", src: "https://r2.fakecrime.bio/tracks/audios/d5edb1e6-1cae-4dd1-a00e-320d4b4627d8.mp3" },
+      { name: "[lovecult] angel", src: "https://r2.fakecrime.bio/tracks/audios/7982b7c3-331a-49d7-adf1-3d1da7e366aa.mp3" }
+    ];
+
+    const trackNameBox = document.getElementById("trackName");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const playBtn = document.getElementById("playBtn");
+    const playIcon = document.getElementById("playIcon");
+
+    const seek = document.getElementById("seek");
+    const vol = document.getElementById("vol");
+    const tCur = document.getElementById("tCur");
+    const tDur = document.getElementById("tDur");
+    const vPct = document.getElementById("vPct");
+
+    const seekWrap = document.getElementById("seekWrap");
+    const volWrap = document.getElementById("volWrap");
+
+    let idx = 0;
+    let seeking = false;
+
+    function fmt(sec){
+      if (!Number.isFinite(sec)) return "0:00";
+      sec = Math.max(0, Math.floor(sec));
+      const m = Math.floor(sec/60);
+      const s = String(sec%60).padStart(2,"0");
+      return `${m}:${s}`;
+    }
+
+    function updatePlayIcon(){
+      const playing = !audio.paused;
+      playIcon.innerHTML = playing
+        ? '<path d="M7 5h3v14H7zm7 0h3v14h-3z"/>'
+        : '<path d="M21.4 9.4a3 3 0 0 1 0 5.2l-12.8 7A3 3 0 0 1 4 19V5a3 3 0 0 1 4.6-2.6z"/>';
+      playBtn.setAttribute("aria-label", playing ? "Pause" : "Play");
+    }
+
+    function animateTrackName(text, dir){
+      // prevent stacking on spam
+      const all = Array.from(trackNameBox.querySelectorAll(".tn"));
+      // keep only the last one for outgoing animation
+      while (all.length > 1) all.shift().remove();
+
+      const old = trackNameBox.querySelector(".tn");
+      if (old){
+        old.classList.remove("out-left","out-right","in-left","in-right");
+        old.classList.add(dir === 1 ? "out-left" : dir === -1 ? "out-right" : "");
+        setTimeout(() => { try{ old.remove(); }catch(e){} }, 260);
+      }
+      // remove any leftovers immediately
+      trackNameBox.querySelectorAll(".tn").forEach((n) => {
+        if (n !== old) n.remove();
+      });
+
+      const span = document.createElement("span");
+      span.className = "tn " + (dir === 1 ? "in-right" : dir === -1 ? "in-left" : "");
+      span.textContent = text;
+      trackNameBox.appendChild(span);
+    }
+
+    function setTrack(i, autoplay=false, dir=0){
+      idx = (i + TRACKS.length) % TRACKS.length;
+      const t = TRACKS[idx];
+      audio.src = t.src;
+      animateTrackName(t.name, dir);
+      if (autoplay) audio.play().catch(()=>{});
+      updatePlayIcon();
+    }
+
+    function updateFill(input, wrap){
+      const pct = (input.value - input.min) / (input.max - input.min);
+      const fill = `${Math.round(pct*100)}%`;
+      input.style.setProperty("--fill", fill);
+      wrap.style.setProperty("--fill", fill);
+    }
+
+    function setGlowPos(e, wrap){
+      const rect = wrap.getBoundingClientRect();
+      const x = Math.min(Math.max(0, e.clientX - rect.left), rect.width);
+      wrap.style.setProperty("--pos", `${(x/rect.width)*100}%`);
+    }
+
+    function setVolumeFromRange(){
+      const v = vol.value / 1000;
+      audio.volume = Math.max(0, Math.min(1, v));
+      vPct.textContent = `${Math.round(v*100)}%`;
+      updateFill(vol, volWrap);
+    }
+
+    let syncing = false;
+    function startSync(){
+      if (syncing) return;
+      syncing = true;
+      requestAnimationFrame(sync);
+    }
+
+    function sync(){
+      const durRaw = audio.duration;
+      const dur = (Number.isFinite(durRaw) && durRaw > 0) ? durRaw : 0;
+      const cur = audio.currentTime || 0;
+
+      if (!seeking){
+        if (dur){
+          seek.value = Math.round((cur/dur) * 1000);
+        } else {
+          // keep seek at 0 until duration is known
+          seek.value = 0;
+        }
+        updateFill(seek, seekWrap);
+      }
+      tCur.textContent = fmt(cur);
+      tDur.textContent = dur ? fmt(dur) : "--:--";
+
+      requestAnimationFrame(sync);
+    }
+
+    // keep UI in sync even if RAF is delayed
+    const uiTick = () => {
+      const durRaw = audio.duration;
+      const dur = (Number.isFinite(durRaw) && durRaw > 0) ? durRaw : 0;
+      const cur = audio.currentTime || 0;
+      if (!seeking){
+        seek.value = dur ? Math.round((cur/dur) * 1000) : 0;
+        updateFill(seek, seekWrap);
+      }
+      tCur.textContent = fmt(cur);
+      tDur.textContent = dur ? fmt(dur) : "--:--";
+    };
+
+    audio.addEventListener("timeupdate", uiTick);
+    audio.addEventListener("durationchange", uiTick);
+    audio.addEventListener("loadedmetadata", uiTick);
+    audio.addEventListener("play", () => { uiTick(); startSync(); });
+
+    playBtn.addEventListener("click", () => {
+      if (audio.paused) audio.play().catch(()=>{});
+      else audio.pause();
+      updatePlayIcon();
+    });
+    let switching = false;
+    function navTrack(delta, dir){
+      if (switching) return;
+      switching = true;
+      setTrack(idx + delta, true, dir);
+      setTimeout(() => switching = false, 320);
+    }
+    prevBtn.addEventListener("click", () => navTrack(-1, -1));
+    nextBtn.addEventListener("click", () => navTrack(1, 1));
+audio.addEventListener("play", updatePlayIcon);
+    audio.addEventListener("pause", updatePlayIcon);
+    audio.addEventListener("ended", () => setTrack(idx+1, true, 1));
+
+    // Seek
+    const stopSeeking = () => { seeking = false; };
+    seek.addEventListener("pointerdown", () => { seeking = true; }, { passive:true });
+    window.addEventListener("pointerup", stopSeeking, { passive:true });
+    window.addEventListener("pointercancel", stopSeeking, { passive:true });
+
+    seek.addEventListener("input", () => {
+      seeking = true;
+      const dur = audio.duration || 0;
+      if (dur){
+        audio.currentTime = dur * (seek.value / 1000);
+      }
+      updateFill(seek, seekWrap);
+    });
+
+    seek.addEventListener("change", () => {
+      const dur = audio.duration || 0;
+      if (dur){
+        audio.currentTime = dur * (seek.value / 1000);
+      }
+      seeking = false;
+    });
+vol.addEventListener("input", () => setVolumeFromRange());
+
+    [seekWrap, volWrap].forEach(wrap => {
+      wrap.addEventListener("pointermove", (e) => setGlowPos(e, wrap));
+      wrap.addEventListener("pointerenter", (e) => setGlowPos(e, wrap));
+    });
+
+    let revealed = false;
+    function revealNow(){
+      if (revealed) return;
+      revealed = true;
+
+      try{ reveal && reveal.remove(); }catch(e){}
+      document.body.classList.add("is-ready");
+
+      // unfreeze at 0:00 + start inside this user gesture
+      try{ audio.currentTime = 0; }catch(e){}
+      audio.muted = false;
+
+      setVolumeFromRange();
+      updateFill(seek, seekWrap);
+
+      forcePlay();
+      startSync();
+
+      window.removeEventListener("pointerdown", revealNow);
+      window.removeEventListener("keydown", revealNow);
+    }
+    if (reveal) {
+      reveal.addEventListener("pointerdown", revealNow, { once: true });
+      reveal.addEventListener("click", revealNow, { once: true });
+    }
+    window.addEventListener("pointerdown", revealNow, { once: true });
+    window.addEventListener("keydown", revealNow, { once: true });
+// init
+    setTrack(idx, false, 0);
+    try{ audio.preload = "auto"; audio.load(); audio.currentTime = 0; }catch(e){}
+    setVolumeFromRange();
+    updateFill(seek, seekWrap);
+// Card "inward deformation" (smoothed)
+    const card = document.getElementById("card");
+    let trX = 0, trY = 0;   // target
+    let crX = 0, crY = 0;   // current
+    let mx = 50, my = 50;
+    let active = false;
+
+    function setTargetsFromEvent(e){
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      const cx = r.width / 2;
+      const cy = r.height / 2;
+      const dx = Math.max(-1, Math.min(1, (x - cx) / cx));
+      const dy = Math.max(-1, Math.min(1, (y - cy) / cy));
+      // smaller angles near edges to avoid jerks
+      trX = (-dy * 4.2);
+      trY = (dx * 5.0);
+      mx = (x / r.width) * 100;
+      my = (y / r.height) * 100;
+    }
+
+    function tick(){
+      // smooth lerp
+      crX += (trX - crX) * 0.10;
+      crY += (trY - crY) * 0.10;
+
+      card.style.setProperty("--rx", crX.toFixed(2) + "deg");
+      card.style.setProperty("--ry", crY.toFixed(2) + "deg");
+      card.style.setProperty("--mx", mx.toFixed(2) + "%");
+      card.style.setProperty("--my", my.toFixed(2) + "%");
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    card.addEventListener("pointerenter", () => { active = true; });
+    card.addEventListener("pointermove", (e) => {
+      active = true;
+      setTargetsFromEvent(e);
+    });
+    card.addEventListener("pointerleave", () => {
+      active = false;
+      trX = 0; trY = 0; mx = 50; my = 50;
+    });
+
+  
+
+  </script>
+</body>
+</html>
